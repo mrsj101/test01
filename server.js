@@ -1,6 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const puppeteer = require('puppeteer');
+const puppeteer = require('puppeteer-core');
 const fs = require('fs');
 const path = require('path');
 const cors = require('cors');
@@ -10,6 +10,8 @@ const PORT = process.env.PORT || 3000;
 
 app.use(bodyParser.json());
 app.use(cors());
+
+// Serve static files (frontend)
 app.use(express.static('public'));
 
 // Endpoint to download tweet
@@ -21,7 +23,16 @@ app.post('/download', async (req, res) => {
   }
 
   try {
-    const browser = await puppeteer.launch({ headless: true });
+    // Download Chromium if not already installed
+    const { executablePath } = await import('@puppeteer/browsers');
+    const browserFetcher = puppeteer.createBrowserFetcher();
+    const revisionInfo = await browserFetcher.download('127.0.6533.88'); // Replace with the required Chromium version
+
+    const browser = await puppeteer.launch({
+      executablePath: revisionInfo.executablePath,
+      headless: true,
+    });
+
     const page = await browser.newPage();
 
     // Navigate to the tweet page
