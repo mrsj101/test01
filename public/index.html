@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tweet Downloader</title>
+</head>
+<body>
+  <h1>Download Tweet</h1>
+  <form id="tweetForm">
+    <label for="url">Tweet URL:</label>
+    <input type="text" id="url" name="url" placeholder="Enter tweet URL" required>
+    <button type="submit">Download</button>
+  </form>
+  <p id="message"></p>
+
+  <script>
+    document.getElementById('tweetForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const url = document.getElementById('url').value;
+
+      const response = await fetch('/download', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url }),
+      });
+
+      const result = await response.json();
+      const messageElement = document.getElementById('message');
+      if (response.ok) {
+        messageElement.textContent = `Success: ${result.message}`;
+      } else {
+        messageElement.textContent = `Error: ${result.error}`;
+      }
+    });
+  </script>
+</body>
+</html>
